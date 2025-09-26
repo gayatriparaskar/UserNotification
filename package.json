@@ -11,6 +11,7 @@
     "generate-icons": "node scripts/generate-icons.js",
     "pwa:install": "npm run generate-icons && echo 'PWA icons generated! Open public/icons/generate-icons.html to create PNG files.'",
     "build:production": "NODE_ENV=production vite build",
+    "build:vercel": "npx vite build",
     "deploy:vercel": "vercel --prod",
     "deploy:preview": "vercel"
   },
