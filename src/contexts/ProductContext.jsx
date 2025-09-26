@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react'
 import apiService from '../services/api'
 
 const ProductContext = createContext()
@@ -70,13 +70,19 @@ export const ProductProvider = ({ children }) => {
   })
 
   // Load products from API
-  const loadProducts = async (params = {}) => {
+  const loadProducts = useCallback(async (params = {}) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true })
       const response = await apiService.getProducts(params)
       
       if (response.success) {
-        dispatch({ type: 'SET_PRODUCTS', payload: response.data.products || [] })
+        // Ensure all products have quantity values for stock tracking
+        const products = (response.data.products || []).map(product => ({
+          ...product,
+          quantity: product.quantity !== undefined ? product.quantity : 10, // Default quantity if missing
+          stock: product.quantity !== undefined ? product.quantity : 10 // Also set stock for backward compatibility
+        }))
+        dispatch({ type: 'SET_PRODUCTS', payload: products })
         dispatch({ type: 'SET_PAGINATION', payload: response.data.pagination })
       } else {
         dispatch({ type: 'SET_ERROR', payload: response.message })
@@ -87,7 +93,7 @@ export const ProductProvider = ({ children }) => {
       dispatch({ type: 'SET_PRODUCTS', payload: [] })
       dispatch({ type: 'SET_ERROR', payload: null })
     }
-  }
+  }, [])
 
   // Load products on mount and when filters change
   useEffect(() => {
@@ -106,7 +112,7 @@ export const ProductProvider = ({ children }) => {
     }
 
     loadProducts(params)
-  }, [state.searchQuery, state.currentCategory, state.currentFilter])
+  }, [state.searchQuery, state.currentCategory, state.currentFilter, loadProducts])
 
   const setFilter = (filter) => {
     dispatch({ type: 'SET_FILTER', payload: filter })
@@ -133,7 +139,7 @@ export const ProductProvider = ({ children }) => {
     }
   }
 
-  const getCategories = async () => {
+  const getCategories = useCallback(async () => {
     try {
       const response = await apiService.getProductCategories()
       if (response.success && response.data.categories) {
@@ -154,7 +160,7 @@ export const ProductProvider = ({ children }) => {
         { name: 'accessories', displayName: 'Accessories', count: 0 }
       ]
     }
-  }
+  }, [])
 
   const value = {
     products: state.products,

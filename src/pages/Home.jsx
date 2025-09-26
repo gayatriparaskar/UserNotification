@@ -28,25 +28,25 @@ const Home = () => {
   const featuredProducts = [
     {
       id: 1,
-      name: "Ball Python",
-      price: 299,
-      image: "https://images.unsplash.com/photo-1544966503-7cc4ac81b4d4?w=400&h=300&fit=crop",
+      name: "Potato Chips",
+      price: 4.99,
+      image: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=400&h=300&fit=crop",
       rating: 4.8,
       reviews: 127
     },
     {
       id: 2,
-      name: "Corn Snake",
-      price: 199,
-      image: "https://images.unsplash.com/photo-1551969014-7d2c4cddf0b6?w=400&h=300&fit=crop",
+      name: "Corn Chips",
+      price: 3.99,
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
       rating: 4.9,
       reviews: 203
     },
     {
       id: 3,
-      name: "Boa Constrictor",
-      price: 599,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+      name: "Tortilla Chips",
+      price: 5.99,
+      image: "https://images.unsplash.com/photo-1544966503-7cc4ac81b4d4?w=400&h=300&fit=crop",
       rating: 4.6,
       reviews: 89
     }
@@ -55,18 +55,18 @@ const Home = () => {
   const features = [
     {
       icon: <Shield className="h-8 w-8" />,
-      title: "Health Guarantee",
-      description: "All snakes come with a 30-day health guarantee"
+      title: "Quality Guarantee",
+      description: "All snacks come with a 30-day freshness guarantee"
     },
     {
       icon: <Truck className="h-8 w-8" />,
-      title: "Safe Shipping",
-      description: "Professional overnight shipping with live arrival guarantee"
+      title: "Fast Shipping",
+      description: "Professional shipping with freshness guarantee"
     },
     {
       icon: <GraduationCap className="h-8 w-8" />,
       title: "Expert Support",
-      description: "24/7 support from our reptile experts"
+      description: "24/7 support from our snack experts"
     }
   ]
 
@@ -78,11 +78,11 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                Premium Snake Collection
+                Premium Snacks Collection
               </h1>
               <p className="text-xl text-gray-200 leading-relaxed">
-                Discover the world's finest collection of exotic and domestic snakes. 
-                Expert care, safe shipping, and lifetime support.
+                Discover the world's finest collection of delicious and healthy snacks. 
+                Expert curation, fast shipping, and lifetime support.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -141,7 +141,7 @@ const Home = () => {
               Shop by Category
             </h2>
             <p className="text-xl text-gray-600">
-              Find the perfect snake for your experience level
+              Find the perfect snacks for your taste preferences
             </p>
           </div>
           
@@ -240,10 +240,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary-800 mb-4">
-              Why Choose SnakeShop?
+              Why Choose SnacksShop?
             </h2>
             <p className="text-xl text-gray-600">
-              We're passionate about providing the best snake care and support
+              We're passionate about providing the best snacks and support
             </p>
           </div>
           
@@ -269,10 +269,10 @@ const Home = () => {
       <section className="py-20 bg-gradient-primary text-white">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to Find Your Perfect Snake?
+            Ready to Find Your Perfect Snacks?
           </h2>
           <p className="text-xl text-gray-200 mb-8">
-            Browse our extensive collection and find the perfect companion for your reptile journey.
+            Browse our extensive collection and find the perfect snacks for your taste journey.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

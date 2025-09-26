@@ -1,5 +1,6 @@
 // API service for connecting to NotificationBackend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api';
+// const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 class ApiService {
   constructor() {
@@ -153,6 +154,58 @@ class ApiService {
     return this.request(`/orders/${id}/cancel`, {
       method: 'POST',
       body: JSON.stringify({ reason }),
+    });
+  }
+
+  // Users API methods
+  async getUsers(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const endpoint = `/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  async getUser(id) {
+    return this.request(`/users/${id}`);
+  }
+
+  async updateUser(id, userData) {
+    return this.request(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async deleteUser(id) {
+    return this.request(`/users/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Products API methods (admin)
+  async createProduct(productData) {
+    return this.request('/products', {
+      method: 'POST',
+      body: JSON.stringify(productData),
+    });
+  }
+
+  async updateProduct(id, productData) {
+    return this.request(`/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(productData),
+    });
+  }
+
+  async deleteProduct(id) {
+    return this.request(`/products/${id}`, {
+      method: 'DELETE',
     });
   }
 

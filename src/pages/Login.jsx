@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -10,8 +10,19 @@ const Login = () => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, isAdmin, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  // Handle redirect after successful login
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (isAdmin) {
+        navigate('/admin')
+      } else {
+        navigate('/')
+      }
+    }
+  }, [isAuthenticated, isAdmin, navigate])
 
   const handleChange = (e) => {
     setFormData({
@@ -26,9 +37,7 @@ const Login = () => {
     
     try {
       const success = await login(formData.email, formData.password)
-      if (success) {
-        navigate('/')
-      }
+      // Redirect will be handled by useEffect
     } catch (error) {
       console.error('Login error:', error)
     } finally {

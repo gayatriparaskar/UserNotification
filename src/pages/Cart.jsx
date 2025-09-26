@@ -1,62 +1,23 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
-import apiService from '../services/api'
 import toast from 'react-hot-toast'
 
 const Cart = () => {
+  const navigate = useNavigate()
   const { items, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart()
   const { isAuthenticated } = useAuth()
-  const [checkingOut, setCheckingOut] = useState(false)
 
-  const handleCheckout = async () => {
-    if (!isAuthenticated) {
-      window.location.href = '/login'
-      return
-    }
-    
+  const handleCheckout = () => {
     if (items.length === 0) {
       toast.error('Your cart is empty!')
       return
     }
 
-    try {
-      setCheckingOut(true)
-      
-      // Prepare order data
-      const orderData = {
-        items: items.map(item => ({
-          productId: item.id,
-          quantity: item.quantity
-        })),
-        shippingAddress: {
-          // In a real app, this would come from a form
-          street: '123 Main St',
-          city: 'Anytown',
-          state: 'CA',
-          zipCode: '12345',
-          country: 'USA'
-        },
-        paymentMethod: 'credit_card',
-        notes: 'Order placed from React frontend'
-      }
-
-      const response = await apiService.createOrder(orderData)
-      
-      if (response.success) {
-        toast.success('Order placed successfully!')
-        clearCart()
-        window.location.href = '/orders'
-      } else {
-        toast.error(response.message || 'Failed to place order')
-      }
-    } catch (error) {
-      toast.error(error.message || 'Failed to place order')
-    } finally {
-      setCheckingOut(false)
-    }
+    // Navigate to checkout page using React Router
+    navigate('/checkout')
   }
 
   if (items.length === 0) {
@@ -69,7 +30,7 @@ const Cart = () => {
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">Your cart is empty</h1>
             <p className="text-gray-600 mb-8">
-              Looks like you haven't added any snakes to your cart yet.
+              Looks like you haven't added any snacks to your cart yet.
             </p>
             <Link to="/catalog" className="btn btn-primary">
               Start Shopping
@@ -112,9 +73,12 @@ const Cart = () => {
               <div key={item.id} className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="flex gap-4">
                   <img
-                    src={item.image}
+                    src={item.image || '/placeholder-snake.svg'}
                     alt={item.name}
                     className="w-24 h-24 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.target.src = '/placeholder-snake.svg'
+                    }}
                   />
                   
                   <div className="flex-1">
@@ -199,10 +163,9 @@ const Cart = () => {
 
               <button
                 onClick={handleCheckout}
-                disabled={checkingOut}
-                className="btn btn-primary w-full mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary w-full mb-4"
               >
-                {checkingOut ? 'Processing...' : 'Proceed to Checkout'}
+                Proceed to Checkout
               </button>
 
               {!isAuthenticated && (

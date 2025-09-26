@@ -1,14 +1,18 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react'
+import { Search, ShoppingCart, Heart, User, Menu, X, Bell } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
+import { useNotifications } from '../contexts/NotificationContext'
+import NotificationCenter from './NotificationCenter'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const { getTotalItems } = useCart()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, isAdmin } = useAuth()
+  const { unreadCount } = useNotifications()
   const location = useLocation()
 
   const navLinks = [
@@ -17,6 +21,11 @@ const Navbar = () => {
     { path: '/care-guide', label: 'Care Guide' },
     { path: '/orders', label: 'Orders' }
   ]
+
+  // Add admin link if user is admin
+  if (isAdmin) {
+    navLinks.push({ path: '/admin', label: 'Admin' })
+  }
 
   const isActive = (path) => {
     return location.pathname === path
@@ -29,9 +38,9 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center">
-              <span className="text-primary-800 font-bold text-lg">🐍</span>
+              <span className="text-primary-800 font-bold text-lg">🍟</span>
             </div>
-            <span className="text-xl font-bold">SnakeShop</span>
+            <span className="text-xl font-bold">SnacksShop</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -50,17 +59,32 @@ const Navbar = () => {
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Search snakes, breeds, accessories..."
-                className="w-full px-4 py-2 pl-10 pr-4 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary-400"
-              />
+                <input
+                  type="text"
+                  placeholder="Search snacks, brands, accessories..."
+                  className="w-full px-4 py-2 pl-10 pr-4 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary-400"
+                />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            {isAuthenticated && (
+              <button 
+                onClick={() => setIsNotificationOpen(true)}
+                className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors group"
+              >
+                <Bell className="h-6 w-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center font-bold animate-pulse shadow-lg px-1">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            )}
+
             {/* Wishlist */}
             <button className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors">
               <Heart className="h-6 w-6" />
@@ -174,6 +198,12 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {/* Notification Center */}
+      <NotificationCenter 
+        isOpen={isNotificationOpen} 
+        onClose={() => setIsNotificationOpen(false)} 
+      />
     </nav>
   )
 }

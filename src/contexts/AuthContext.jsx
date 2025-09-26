@@ -117,6 +117,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user: state.user,
     isAuthenticated: state.isAuthenticated,
+    isAdmin: state.user?.role === 'admin',
     loading: state.loading,
     error: state.error,
     login,

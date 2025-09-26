@@ -1,7 +1,7 @@
 {
-  "name": "SnakeShop - Premium Snake Collection",
-  "short_name": "SnakeShop",
-  "description": "Discover the world's finest collection of exotic and domestic snakes. Premium quality, expert care guidance, and safe shipping.",
+  "name": "SnacksShop - Premium Snacks Collection",
+  "short_name": "SnacksShop",
+  "description": "Discover the world's finest collection of delicious and healthy snacks. Premium quality, expert curation, and fast shipping.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#2c5530",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["shopping", "lifestyle", "pets"],
+  "categories": ["shopping", "lifestyle", "food"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -62,9 +62,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Browse Snakes",
+      "name": "Browse Snacks",
       "short_name": "Catalog",
-      "description": "Browse our snake collection",
+      "description": "Browse our snacks collection",
       "url": "/catalog",
       "icons": [
         {
@@ -76,7 +76,7 @@
     {
       "name": "Care Guide",
       "short_name": "Care",
-      "description": "Learn about snake care",
+      "description": "Learn about snacks",
       "url": "/care-guide",
       "icons": [
         {
@@ -104,14 +104,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "SnakeShop Homepage"
+      "label": "SnacksShop Homepage"
     },
     {
       "src": "/screenshots/mobile-catalog.png",
       "sizes": "375x667",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Snake Catalog on Mobile"
+      "label": "Snacks Catalog on Mobile"
     }
   ],
   "related_applications": [],
