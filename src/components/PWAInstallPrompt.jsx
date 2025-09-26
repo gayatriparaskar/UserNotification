@@ -7,6 +7,7 @@ const PWAInstallPrompt = () => {
   const [isInstalled, setIsInstalled] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
+  const [showDelay, setShowDelay] = useState(false)
 
   useEffect(() => {
     // Check if app is already installed
@@ -32,7 +33,11 @@ const PWAInstallPrompt = () => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault()
       setDeferredPrompt(e)
-      setShowInstallPrompt(true)
+      // Add delay before showing prompt
+      setTimeout(() => {
+        setShowDelay(true)
+        setShowInstallPrompt(true)
+      }, 10000) // Show after 10 seconds
     }
 
     // Listen for appinstalled event
@@ -78,89 +83,71 @@ const PWAInstallPrompt = () => {
     return null
   }
 
-  // Check if user dismissed recently (within 24 hours)
+  // Check if user dismissed recently (within 7 days)
   const dismissedTime = localStorage.getItem('pwa-install-dismissed')
-  if (dismissedTime && Date.now() - parseInt(dismissedTime) < 24 * 60 * 60 * 1000) {
+  if (dismissedTime && Date.now() - parseInt(dismissedTime) < 7 * 24 * 60 * 60 * 1000) {
     return null
   }
 
-  if (!showInstallPrompt) {
+  if (!showInstallPrompt || !showDelay) {
     return null
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 animate-slide-in">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🐍</span>
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 animate-slide-in">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+              <span className="text-lg">🍿</span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">Install SnakeShop</h3>
-              <p className="text-sm text-gray-600">Get quick access to our snake collection</p>
+              <h3 className="font-semibold text-gray-800 text-sm">Install SnacksShop</h3>
+              <p className="text-xs text-gray-600">Get quick access</p>
             </div>
           </div>
           <button
             onClick={handleDismiss}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {isIOS ? (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">
-              To install SnakeShop on your iOS device:
+          <div className="space-y-2">
+            <p className="text-xs text-gray-600">
+              To install on iOS: Share → Add to Home Screen
             </p>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <span>Tap the Share button in Safari</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <span>Scroll down and tap "Add to Home Screen"</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <span>Tap "Add" to confirm</span>
-              </div>
-            </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Smartphone className="h-4 w-4" />
-              <span>Access SnakeShop like a native app</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <Smartphone className="h-3 w-3" />
+              <span>Native app experience</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Monitor className="h-4 w-4" />
-              <span>Works offline with cached content</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Download className="h-4 w-4" />
-              <span>Get notifications for new snakes</span>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <Download className="h-3 w-3" />
+              <span>Get notifications</span>
             </div>
           </div>
         )}
 
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-2 mt-3">
           {!isIOS && (
             <button
               onClick={handleInstallClick}
-              className="btn btn-primary flex-1 flex items-center justify-center gap-2"
+              className="btn btn-primary btn-sm flex items-center gap-1"
             >
-              <Download className="h-4 w-4" />
-              Install App
+              <Download className="h-3 w-3" />
+              Install
             </button>
           )}
           <button
             onClick={handleDismiss}
-            className="btn btn-outline flex-1"
+            className="btn btn-outline btn-sm"
           >
-            Maybe Later
+            Later
           </button>
         </div>
       </div>

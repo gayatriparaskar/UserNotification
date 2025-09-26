@@ -9,11 +9,8 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Initialize socket connection
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api'
     const socketUrl = apiUrl.replace('/api', '')
-    console.log('🔔 Socket connecting to:', socketUrl)
-    console.log('🔔 VITE_API_URL:', import.meta.env.VITE_API_URL)
-    console.log('🔔 Processed socket URL:', socketUrl)
     
     const socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'],
@@ -25,32 +22,26 @@ export const SocketProvider = ({ children }) => {
     })
 
     socketInstance.on('connect', () => {
-      console.log('🔔 Socket connected:', socketInstance.id)
       setIsConnected(true)
     })
 
     socketInstance.on('disconnect', () => {
-      console.log('🔔 Socket disconnected')
       setIsConnected(false)
     })
 
     socketInstance.on('connect_error', (error) => {
-      console.error('🔔 Socket connection error:', error)
-      console.error('🔔 Error details:', error.message)
       setIsConnected(false)
     })
 
-    socketInstance.on('reconnect', (attemptNumber) => {
-      console.log('🔔 Socket reconnected after', attemptNumber, 'attempts')
+    socketInstance.on('reconnect', () => {
       setIsConnected(true)
     })
 
-    socketInstance.on('reconnect_error', (error) => {
-      console.error('🔔 Socket reconnection error:', error)
+    socketInstance.on('reconnect_error', () => {
+      // Handle reconnection error silently
     })
 
     socketInstance.on('reconnect_failed', () => {
-      console.error('🔔 Socket reconnection failed')
       setIsConnected(false)
     })
 
@@ -64,21 +55,7 @@ export const SocketProvider = ({ children }) => {
   // Join user room for notifications
   const joinUserRoom = (userId) => {
     if (socket && userId) {
-      console.log('🔔 Joining user room for:', userId)
       socket.emit('join-user-room', userId)
-      console.log('🔔 Joined user room for:', userId)
-    } else {
-      console.log('🔔 Cannot join room - socket:', !!socket, 'userId:', userId)
-    }
-  }
-
-  // Manual connection test
-  const testConnection = () => {
-    if (socket) {
-      console.log('🔔 Testing socket connection...')
-      socket.emit('test-connection', { message: 'Hello from frontend' })
-    } else {
-      console.log('🔔 No socket available for testing')
     }
   }
 
@@ -86,7 +63,6 @@ export const SocketProvider = ({ children }) => {
   const leaveUserRoom = (userId) => {
     if (socket && userId) {
       socket.emit('leave-user-room', userId)
-      console.log('Left user room for:', userId)
     }
   }
 
@@ -126,8 +102,7 @@ export const SocketProvider = ({ children }) => {
     onNotification,
     offNotification,
     onOrderUpdate,
-    offOrderUpdate,
-    testConnection
+    offOrderUpdate
   }
 
   return (

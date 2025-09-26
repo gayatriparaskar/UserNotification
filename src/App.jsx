@@ -13,7 +13,6 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import PWAUpdateNotification from './components/PWAUpdateNotification'
-import NotificationTest from './components/NotificationTest'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
@@ -81,14 +80,8 @@ const AppContent = () => {
       {/* PWA Install Prompt */}
       <PWAInstallPrompt />
       
-          {/* PWA Update Notification */}
-          <PWAUpdateNotification />
-          
-          {/* Notification Test (Development Only) */}
-          <NotificationTest />
-          
-          
-      
+      {/* PWA Update Notification */}
+      <PWAUpdateNotification />
       
       <Toaster 
         position="top-right"
