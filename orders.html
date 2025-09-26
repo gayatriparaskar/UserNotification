@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - SnakeShop</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .orders-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+        }
+        
+        .orders-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .orders-header h1 {
+            font-size: 2.5rem;
+            color: #2c5530;
+            margin-bottom: 1rem;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-left: 4px solid #4a7c59;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .order-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c5530;
+        }
+        
+        .order-date {
+            color: #666;
+        }
+        
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-shipped {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .order-items {
+            margin: 1rem 0;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .order-item-info {
+            flex: 1;
+        }
+        
+        .order-item-name {
+            font-weight: 600;
+            color: #2c5530;
+            margin-bottom: 0.25rem;
+        }
+        
+        .order-item-breed {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-item-price {
+            font-weight: 600;
+            color: #4a7c59;
+        }
+        
+        .order-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .order-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c5530;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+        
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .empty-orders i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        
+        .tracking-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .tracking-number {
+            font-weight: 600;
+            color: #2c5530;
+        }
+        
+        .tracking-status {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-summary {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .order-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-snake"></i>
+                <span>SnakeShop</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#catalog" class="nav-link">Catalog</a>
+                <a href="index.html#about" class="nav-link">About</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="nav-btn" id="wishlistBtn">
+                    <i class="fas fa-heart"></i>
+                    <span class="badge" id="wishlistCount">0</span>
+                </button>
+                <button class="nav-btn" id="cartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge" id="cartCount">0</span>
+                </button>
+                <button class="nav-btn" id="userBtn">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Orders Container -->
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1>Order History</h1>
+            <p>Track your snake purchases and orders</p>
+        </div>
+        
+        <div id="ordersList">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SnakeShop</h3>
+                    <p>Your trusted source for premium snakes and reptile supplies.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#catalog">Catalog</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Care Guides</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SnakeShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Load orders from localStorage
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('snakeOrders')) || [];
+            const ordersList = document.getElementById('ordersList');
+            
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="empty-orders">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>No orders yet</h3>
+                        <p>Start shopping to see your orders here!</p>
+                        <a href="index.html" class="btn btn-primary">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-number">Order #${order.id}</div>
+                            <div class="order-date">${new Date(order.date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="order-status status-${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</div>
+                    </div>
+                    
+                    <div class="order-items">
+                        ${order.items.map(item => `
+                            <div class="order-item">
+                                <img src="${item.image}" alt="${item.name}">
+                                <div class="order-item-info">
+                                    <div class="order-item-name">${item.name}</div>
+                                    <div class="order-item-breed">${item.breed || 'Accessory'}</div>
+                                </div>
+                                <div class="order-item-price">$${item.price} x ${item.quantity}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${order.trackingNumber ? `
+                        <div class="tracking-info">
+                            <div class="tracking-number">Tracking: ${order.trackingNumber}</div>
+                            <div class="tracking-status">${order.trackingStatus || 'Package in transit'}</div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="order-summary">
+                        <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline btn-small" onclick="viewOrderDetails('${order.id}')">View Details</button>
+                            ${order.status === 'delivered' ? '<button class="btn btn-primary btn-small" onclick="reorder(\'' + order.id + '\')">Reorder</button>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function viewOrderDetails(orderId) {
+            alert(`Order details for #${orderId} would be shown here.`);
+        }
+        
+        function reorder(orderId) {
+            const orders = JSON.parse(localStorage.getItem('snakeOrders')) || [];
+            const order = orders.find(o => o.id === orderId);
+            
+            if (order) {
+                // Add items back to cart
+                const cart = JSON.parse(localStorage.getItem('snakeCart')) || [];
+                order.items.forEach(item => {
+                    const existingItem = cart.find(cartItem => cartItem.id === item.id);
+                    if (existingItem) {
+                        existingItem.quantity += item.quantity;
+                    } else {
+                        cart.push({
+                            ...item,
+                            quantity: item.quantity
+                        });
+                    }
+                });
+                
+                localStorage.setItem('snakeCart', JSON.stringify(cart));
+                alert('Items added to cart!');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrders();
+            updateCartDisplay();
+            updateWishlistDisplay();
+        });
+        
+        // Cart and wishlist functions (from main script)
+        function updateCartDisplay() {
+            const cart = JSON.parse(localStorage.getItem('snakeCart')) || [];
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
+                cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        function updateWishlistDisplay() {
+            const wishlist = JSON.parse(localStorage.getItem('snakeWishlist')) || [];
+            const wishlistCount = document.getElementById('wishlistCount');
+            if (wishlistCount) {
+                wishlistCount.textContent = wishlist.length;
+                wishlistCount.style.display = wishlist.length > 0 ? 'flex' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+// API service for connecting to NotificationBackend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api';
+
+class ApiService {
+  constructor() {
+    this.baseURL = API_BASE_URL;
+  }
+
+  // Helper method to get auth token
+  getAuthToken() {
+    return localStorage.getItem('snakeAuthToken');
+  }
+
+  // Helper method to get headers
+  getHeaders(includeAuth = true) {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (includeAuth && this.getAuthToken()) {
+      headers.Authorization = `Bearer ${this.getAuthToken()}`;
+    }
+
+    return headers;
+  }
+
+  // Generic request method
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const config = {
+      headers: this.getHeaders(options.includeAuth !== false),
+      ...options,
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      // Handle cases where response is not JSON
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = { message: `HTTP error! status: ${response.status}` };
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`API request failed for ${endpoint}:`, error);
+      throw error;
+    }
+  }
+
+  // Auth API methods
+  async login(email, password) {
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+      includeAuth: false,
+    });
+
+    if (response.success && response.data.token) {
+      localStorage.setItem('snakeAuthToken', response.data.token);
+      localStorage.setItem('snakeUser', JSON.stringify(response.data.user));
+    }
+
+    return response;
+  }
+
+  async register(userData) {
+    const response = await this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+      includeAuth: false,
+    });
+
+    if (response.success && response.data.token) {
+      localStorage.setItem('snakeAuthToken', response.data.token);
+      localStorage.setItem('snakeUser', JSON.stringify(response.data.user));
+    }
+
+    return response;
+  }
+
+  async logout() {
+    localStorage.removeItem('snakeAuthToken');
+    localStorage.removeItem('snakeUser');
+  }
+
+  // Products API methods
+  async getProducts(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const endpoint = `/products${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  async getProduct(id) {
+    return this.request(`/products/${id}`);
+  }
+
+  async getProductCategories() {
+    return this.request('/products/categories');
+  }
+
+  async getProductSpecies() {
+    return this.request('/products/species');
+  }
+
+  // Orders API methods
+  async getOrders(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const endpoint = `/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  async getOrder(id) {
+    return this.request(`/orders/${id}`);
+  }
+
+  async createOrder(orderData) {
+    return this.request('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async updateOrderStatus(id, status, trackingNumber, notes) {
+    return this.request(`/orders/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, trackingNumber, notes }),
+    });
+  }
+
+  async cancelOrder(id, reason) {
+    return this.request(`/orders/${id}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
+  // Notifications API methods
+  async getNotifications(params = {}) {
+    const queryParams = new URLSearchParams();
+    
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+
+    const endpoint = `/notifications${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
+  }
+
+  async markNotificationAsRead(id) {
+    return this.request(`/notifications/${id}/read`, {
+      method: 'PUT',
+    });
+  }
+
+  async markAllNotificationsAsRead() {
+    return this.request('/notifications/read-all', {
+      method: 'PUT',
+    });
+  }
+
+  async getUnreadCount() {
+    return this.request('/notifications/unread-count');
+  }
+
+  // User API methods
+  async getProfile() {
+    return this.request('/users/profile');
+  }
+
+  async updateProfile(userData) {
+    return this.request('/users/profile', {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async changePassword(passwordData) {
+    return this.request('/users/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordData),
+    });
+  }
+}
+
+// Create and export a singleton instance
+const apiService = new ApiService();
+export default apiService;
