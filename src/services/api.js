@@ -25,7 +25,7 @@ class ApiService {
     return headers;
   }
 
-  // Generic request method
+  // Generic request method with timeout and retry
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
@@ -33,8 +33,14 @@ class ApiService {
       ...options,
     };
 
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    config.signal = controller.signal;
+
     try {
       const response = await fetch(url, config);
+      clearTimeout(timeoutId);
       
       // Handle cases where response is not JSON
       let data;
@@ -51,6 +57,17 @@ class ApiService {
 
       return data;
     } catch (error) {
+      clearTimeout(timeoutId);
+      
+      // Handle specific error types
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - server is not responding');
+      } else if (error.message.includes('ERR_INSUFFICIENT_RESOURCES')) {
+        throw new Error('Server is overloaded or unavailable');
+      } else if (error.message.includes('Failed to fetch')) {
+        throw new Error('Network error - please check your connection');
+      }
+      
       console.error(`API request failed for ${endpoint}:`, error);
       throw error;
     }

@@ -13,6 +13,7 @@ import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import PWAUpdateNotification from './components/PWAUpdateNotification'
+import ConnectionStatus from './components/ConnectionStatus'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
@@ -76,6 +77,9 @@ const AppContent = () => {
           } />
         </Routes>
       </main>
+      
+      {/* Connection Status */}
+      <ConnectionStatus />
       
       {/* PWA Install Prompt */}
       <PWAInstallPrompt />

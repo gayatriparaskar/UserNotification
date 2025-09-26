@@ -113,16 +113,22 @@ export const NotificationProvider = ({ children }) => {
         dispatch({ type: 'SET_NOTIFICATIONS', payload: notifications })
         dispatch({ type: 'SET_UNREAD_COUNT', payload: unreadCount })
         
-        // Play sound if there are unread notifications
-        if (unreadCount > 0) {
+        // Only play sound if there are unread notifications AND we haven't played recently
+        if (unreadCount > 0 && !localStorage.getItem('notification-sound-played')) {
           playNotificationSound()
+          localStorage.setItem('notification-sound-played', Date.now().toString())
+          // Clear the flag after 5 seconds
+          setTimeout(() => {
+            localStorage.removeItem('notification-sound-played')
+          }, 5000)
         }
       } else {
         dispatch({ type: 'SET_ERROR', payload: response.message })
       }
     } catch (error) {
       console.error('Error loading notifications:', error)
-      dispatch({ type: 'SET_ERROR', payload: error.message })
+      // Don't play sound on error, just set error state
+      dispatch({ type: 'SET_ERROR', payload: 'Unable to load notifications. Please check your connection.' })
     }
   }
 
@@ -154,14 +160,39 @@ export const NotificationProvider = ({ children }) => {
   const addNotification = (notification) => {
     dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
     
-    // Play notification sound for new notifications
-    playNotificationSound()
+    // Only play sound for new notifications, not on every add
+    if (!localStorage.getItem('realtime-notification-sound-played')) {
+      playNotificationSound()
+      localStorage.setItem('realtime-notification-sound-played', Date.now().toString())
+      // Clear the flag after 3 seconds
+      setTimeout(() => {
+        localStorage.removeItem('realtime-notification-sound-played')
+      }, 3000)
+    }
   }
 
-  // Load notifications on mount
+  // Load notifications on mount with retry logic
   useEffect(() => {
     if (isAuthenticated) {
-      loadNotifications()
+      let retryCount = 0
+      const maxRetries = 3
+      
+      const loadWithRetry = async () => {
+        try {
+          await loadNotifications()
+        } catch (error) {
+          if (retryCount < maxRetries) {
+            retryCount++
+            const delay = Math.pow(2, retryCount) * 1000 // Exponential backoff: 2s, 4s, 8s
+            console.log(`Retrying notification load in ${delay}ms (attempt ${retryCount}/${maxRetries})`)
+            setTimeout(loadWithRetry, delay)
+          } else {
+            console.log('Max retries reached for notification loading')
+          }
+        }
+      }
+      
+      loadWithRetry()
     }
   }, [isAuthenticated])
 
@@ -173,7 +204,8 @@ export const NotificationProvider = ({ children }) => {
     loadNotifications,
     markAsRead,
     markAllAsRead,
-    addNotification
+    addNotification,
+    isOnline: !state.error || !state.error.includes('Unable to load notifications')
   }
 
   return (
