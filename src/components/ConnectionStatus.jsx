@@ -10,6 +10,11 @@ const ConnectionStatus = () => {
     return null
   }
 
+  // Don't show timeout errors as they're temporary
+  if (error && error.includes('timeout')) {
+    return null
+  }
+
   return (
     <div className="fixed top-4 left-4 right-4 z-50 max-w-md mx-auto">
       <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">

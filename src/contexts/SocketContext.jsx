@@ -3,45 +3,61 @@ import io from 'socket.io-client'
 
 const SocketContext = createContext()
 
+// Global connection counter
+let connectionCount = 0
+
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null)
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
     // Initialize socket connection
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api'
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
     const socketUrl = apiUrl.replace('/api', '')
+    
+    connectionCount++
+    console.log(`🔌 Connecting to socket (attempt #${connectionCount}):`, socketUrl)
     
     const socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      timeout: 20000
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      timeout: 30000,
+      forceNew: true,
+      upgrade: true,
+      rememberUpgrade: false,
+      withCredentials: true
     })
 
     socketInstance.on('connect', () => {
+      console.log('🔌 Socket connected successfully')
       setIsConnected(true)
     })
 
-    socketInstance.on('disconnect', () => {
+    socketInstance.on('disconnect', (reason) => {
+      console.log('🔌 Socket disconnected:', reason)
       setIsConnected(false)
     })
 
     socketInstance.on('connect_error', (error) => {
+      console.error('🔌 Socket connection error:', error)
       setIsConnected(false)
     })
 
-    socketInstance.on('reconnect', () => {
+    socketInstance.on('reconnect', (attemptNumber) => {
+      console.log('🔌 Socket reconnected after', attemptNumber, 'attempts')
       setIsConnected(true)
     })
 
-    socketInstance.on('reconnect_error', () => {
-      // Handle reconnection error silently
+    socketInstance.on('reconnect_error', (error) => {
+      console.error('🔌 Socket reconnection error:', error)
     })
 
     socketInstance.on('reconnect_failed', () => {
+      console.error('🔌 Socket reconnection failed')
       setIsConnected(false)
     })
 
@@ -70,6 +86,7 @@ export const SocketProvider = ({ children }) => {
   const onNotification = (callback) => {
     if (socket) {
       socket.on('notification', callback)
+      socket.on('new-notification', callback) // Also listen for new-notification events
     }
   }
 
@@ -77,6 +94,7 @@ export const SocketProvider = ({ children }) => {
   const offNotification = (callback) => {
     if (socket) {
       socket.off('notification', callback)
+      socket.off('new-notification', callback)
     }
   }
 

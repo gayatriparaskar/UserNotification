@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CreditCard, MapPin, User, Phone, Mail, Lock } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
@@ -11,6 +11,8 @@ const Checkout = () => {
   const { items, getTotalPrice, clearCart } = useCart()
   const { isAuthenticated, user } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [orderPlaced, setOrderPlaced] = useState(false)
+  const orderInProgress = useRef(false)
   const [step, setStep] = useState(1)
   
   // Form state
@@ -94,8 +96,19 @@ const Checkout = () => {
   }
 
   const handlePlaceOrder = async () => {
+    const orderId = Date.now() + Math.random()
+    console.log(`🛒 handlePlaceOrder called (ID: ${orderId}) - preventing duplicate calls`)
+    
+    if (loading || orderPlaced || orderInProgress.current) {
+      console.log(`🛒 Order already being processed or placed (ID: ${orderId}), ignoring duplicate call`)
+      return
+    }
+    
     try {
+      orderInProgress.current = true
       setLoading(true)
+      setOrderPlaced(true)
+      console.log(`🛒 Starting order placement (ID: ${orderId})`)
       
       const orderData = {
         items: items.map(item => ({
@@ -121,6 +134,7 @@ const Checkout = () => {
         notes: formData.notes
       }
 
+      console.log(`🛒 Creating order (ID: ${orderId}) with data:`, orderData)
       const response = await apiService.createOrder(orderData)
       
       if (response.success) {
@@ -134,6 +148,7 @@ const Checkout = () => {
       toast.error(error.message || 'Failed to place order')
     } finally {
       setLoading(false)
+      orderInProgress.current = false
     }
   }
 
@@ -494,8 +509,12 @@ const Checkout = () => {
                   </button>
                 ) : (
                   <button
-                    onClick={handlePlaceOrder}
-                    disabled={loading}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handlePlaceOrder()
+                    }}
+                    disabled={loading || orderPlaced}
                     className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Processing...' : 'Place Order'}

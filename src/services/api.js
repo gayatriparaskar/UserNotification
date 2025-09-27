@@ -1,6 +1,6 @@
 // API service for connecting to NotificationBackend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api';
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 class ApiService {
   constructor() {
@@ -154,6 +154,8 @@ class ApiService {
   }
 
   async createOrder(orderData) {
+    const apiCallId = Date.now() + Math.random()
+    console.log(`🛒 API: createOrder called (ID: ${apiCallId}) with data:`, orderData)
     return this.request('/orders', {
       method: 'POST',
       body: JSON.stringify(orderData),

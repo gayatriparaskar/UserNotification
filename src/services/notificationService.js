@@ -1,4 +1,5 @@
 import apiService from './api'
+import webPushService from './webPushService'
 
 class NotificationService {
   constructor() {
@@ -22,6 +23,22 @@ class NotificationService {
       } catch (error) {
         console.error('Service worker registration failed:', error)
       }
+    }
+
+    // Initialize web push service
+    try {
+      console.log('🔧 NotificationService: Initializing web push service...')
+      const webPushResult = await webPushService.initialize()
+      console.log('🔧 WebPushService initialization result:', webPushResult)
+      
+      if (webPushResult.supported) {
+        console.log('✅ Web push service initialized successfully')
+      } else {
+        console.log('❌ Web push not supported:', webPushResult.reason)
+      }
+    } catch (error) {
+      console.error('❌ Error initializing web push service:', error)
+      console.error('❌ Error details:', error.message)
     }
 
     return true
@@ -54,7 +71,7 @@ class NotificationService {
   // Show notification
   async showNotification(title, options = {}) {
     if (!this.isSupported || this.permission !== 'granted') {
-      console.log('Notifications not available')
+      console.log('🔔 Notifications not available - permission:', this.permission)
       return false
     }
 
@@ -72,30 +89,40 @@ class NotificationService {
     }
 
     try {
+      console.log('🔔 Showing browser notification:', title)
+      
       if (this.registration && this.registration.showNotification) {
         await this.registration.showNotification(title, notificationOptions)
+        console.log('🔔 Service worker notification shown')
       } else {
         const notification = new Notification(title, notificationOptions)
+        console.log('🔔 Native notification shown')
         
         notification.onclick = () => {
+          console.log('🔔 Notification clicked')
           window.focus()
           if (options.url) {
             window.location.href = options.url
           }
           notification.close()
         }
+        
+        // Auto close after 5 seconds
+        setTimeout(() => {
+          notification.close()
+        }, 5000)
       }
 
       return true
     } catch (error) {
-      console.error('Error showing notification:', error)
+      console.error('🔔 Error showing notification:', error)
       return false
     }
   }
 
   // Set badge count
   setBadgeCount(count) {
-    console.log('Notification Service: Setting badge count to', count)
+    console.log('🔔 Setting badge count to', count)
     
     // Update document title
     this.updateDocumentTitle(count)
@@ -112,19 +139,19 @@ class NotificationService {
     if ('setAppBadge' in navigator) {
       if (count > 0) {
         navigator.setAppBadge(count).then(() => {
-          console.log('Notification Service: Native badge set successfully to', count)
+          console.log('🔔 Native badge set successfully to', count)
         }).catch(error => {
-          console.log('Notification Service: Native badge failed:', error)
+          console.log('🔔 Native badge failed:', error)
         })
       } else {
         navigator.clearAppBadge().then(() => {
-          console.log('Notification Service: Native badge cleared successfully')
+          console.log('🔔 Native badge cleared successfully')
         }).catch(error => {
-          console.log('Notification Service: Native badge clear failed:', error)
+          console.log('🔔 Native badge clear failed:', error)
         })
       }
     } else {
-      console.log('Notification Service: Badge API not supported')
+      console.log('🔔 Badge API not supported')
     }
   }
 
@@ -198,6 +225,84 @@ class NotificationService {
       isSupported: this.isSupported,
       permission: this.permission,
       canShow: this.isSupported && this.permission === 'granted'
+    }
+  }
+
+  // Subscribe to web push notifications
+  async subscribeToPush() {
+    try {
+      const result = await webPushService.subscribe()
+      if (result.success) {
+        console.log('✅ Successfully subscribed to web push notifications')
+        return true
+      } else {
+        console.error('Failed to subscribe to web push:', result.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Error subscribing to web push:', error)
+      return false
+    }
+  }
+
+  // Unsubscribe from web push notifications
+  async unsubscribeFromPush() {
+    try {
+      const result = await webPushService.unsubscribe()
+      if (result.success) {
+        console.log('✅ Successfully unsubscribed from web push notifications')
+        return true
+      } else {
+        console.error('Failed to unsubscribe from web push:', result.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Error unsubscribing from web push:', error)
+      return false
+    }
+  }
+
+  // Test web push notification
+  async testPushNotification() {
+    try {
+      const result = await webPushService.testNotification()
+      if (result.success) {
+        console.log('✅ Test push notification sent')
+        return true
+      } else {
+        console.error('Failed to send test push notification:', result.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Error sending test push notification:', error)
+      return false
+    }
+  }
+
+  // Get web push status
+  async getPushStatus() {
+    try {
+      return await webPushService.getStatus()
+    } catch (error) {
+      console.error('Error getting push status:', error)
+      return { success: false, error: error.message }
+    }
+  }
+
+  // Update push preferences
+  async updatePushPreferences(pushEnabled) {
+    try {
+      const result = await webPushService.updatePreferences(pushEnabled)
+      if (result.success) {
+        console.log('✅ Push preferences updated')
+        return true
+      } else {
+        console.error('Failed to update push preferences:', result.error)
+        return false
+      }
+    } catch (error) {
+      console.error('Error updating push preferences:', error)
+      return false
     }
   }
 }

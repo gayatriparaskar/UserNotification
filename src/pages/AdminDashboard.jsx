@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { Calendar, Users, DollarSign, TrendingUp, Eye, Plus, Check, X, Settings, Bell, AlertCircle, Package, ShoppingCart, UserCheck } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
+import { useSocket } from '../contexts/SocketContext'
 import apiService from '../services/api'
 import toast from 'react-hot-toast'
 
 const AdminDashboard = () => {
   const { user, isAuthenticated, isAdmin } = useAuth()
-  const { unreadCount } = useNotifications()
+  const { unreadCount, loadNotifications } = useNotifications()
+  const { socket, isConnected } = useSocket()
   const [activeTab, setActiveTab] = useState('overview')
   const [loading, setLoading] = useState(false)
   const [orders, setOrders] = useState([])
@@ -29,6 +31,58 @@ const AdminDashboard = () => {
   const [newStatus, setNewStatus] = useState('')
   const [trackingNumber, setTrackingNumber] = useState('')
   const [adminNotes, setAdminNotes] = useState('')
+
+  // Test notification function
+  const testNotification = async () => {
+    try {
+      console.log('🔔 Testing notification...')
+      console.log('🔔 Socket connected:', isConnected)
+      console.log('🔔 Socket ID:', socket?.id)
+      
+      // Test browser notification
+      if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+          const notification = new Notification('🔔 Test Notification', {
+            body: 'This is a test notification from SnacksShop Admin',
+            icon: '/logo192.png',
+            tag: 'test-notification'
+          })
+          
+          notification.onclick = () => {
+            console.log('🔔 Test notification clicked')
+            notification.close()
+          }
+          
+          setTimeout(() => notification.close(), 5000)
+          toast.success('🔔 Test notification sent!')
+        } else {
+          const permission = await Notification.requestPermission()
+          if (permission === 'granted') {
+            testNotification() // Retry after permission granted
+          } else {
+            toast.error('Notification permission denied')
+          }
+        }
+      } else {
+        toast.error('Notifications not supported in this browser')
+      }
+    } catch (error) {
+      console.error('🔔 Test notification error:', error)
+      toast.error('Failed to send test notification')
+    }
+  }
+
+  // Refresh notifications function
+  const refreshNotifications = async () => {
+    try {
+      toast.loading('Refreshing notifications...', { id: 'refresh' })
+      await loadNotifications()
+      toast.success('Notifications refreshed!', { id: 'refresh' })
+    } catch (error) {
+      console.error('Error refreshing notifications:', error)
+      toast.error('Failed to refresh notifications', { id: 'refresh' })
+    }
+  }
 
   // Redirect if not admin
   useEffect(() => {
@@ -144,6 +198,20 @@ const AdminDashboard = () => {
             <p className="text-gray-600 mt-2">Manage your snacks shop platform</p>
           </div>
           <div className="flex items-center space-x-4">
+            <button
+              onClick={refreshNotifications}
+              className="btn btn-outline inline-flex items-center"
+            >
+              <Bell className="h-5 w-5 mr-2" />
+              Refresh Notifications
+            </button>
+            <button
+              onClick={testNotification}
+              className="btn btn-secondary inline-flex items-center"
+            >
+              <Bell className="h-5 w-5 mr-2" />
+              Test Notification
+            </button>
             <Link
               to="/admin/add-product"
               className="btn btn-primary inline-flex items-center"
