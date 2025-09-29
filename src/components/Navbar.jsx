@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Search, ShoppingCart, Heart, User, Menu, X, Bell, Download } from 'lucide-react'
+import { Search, ShoppingCart, Heart, User, Menu, X, Bell, Download, Settings } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
 import { usePWA } from '../hooks/usePWA'
 import NotificationCenter from './NotificationCenter'
+import notificationService from '../services/notificationService'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -31,6 +32,19 @@ const Navbar = () => {
 
   const isActive = (path) => {
     return location.pathname === path
+  }
+
+  const handleRequestNotificationPermission = async () => {
+    try {
+      const granted = await notificationService.requestPermission()
+      if (granted) {
+        console.log('Notification permission granted')
+      } else {
+        console.log('Notification permission denied')
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error)
+    }
   }
 
   return (
@@ -74,17 +88,29 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {/* Notifications */}
             {isAuthenticated && (
-              <button 
-                onClick={() => setIsNotificationOpen(true)}
-                className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors group"
-              >
-                <Bell className="h-6 w-6" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center font-bold animate-pulse shadow-lg px-1">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
+              <>
+                <button 
+                  onClick={() => setIsNotificationOpen(true)}
+                  className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors group"
+                >
+                  <Bell className="h-6 w-6" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center font-bold animate-pulse shadow-lg px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                {Notification.permission === 'denied' && (
+                  <button 
+                    onClick={handleRequestNotificationPermission}
+                    className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
+                    title="Enable notifications"
+                  >
+                    <Settings className="h-6 w-6" />
+                  </button>
                 )}
-              </button>
+              </>
             )}
 
             {/* Wishlist */}

@@ -29,7 +29,6 @@ export const SocketProvider = ({ children }) => {
       forceNew: true,
       upgrade: true,
       rememberUpgrade: false,
-      withCredentials: true,
       // Mobile-specific options
       pingTimeout: 60000,
       pingInterval: 25000
