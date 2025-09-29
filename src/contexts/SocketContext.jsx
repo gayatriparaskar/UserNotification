@@ -41,6 +41,8 @@ export const SocketProvider = ({ children }) => {
       console.log('🔌 Transport:', socketInstance.io.engine.transport.name)
       console.log('🔌 User agent:', navigator.userAgent)
       console.log('🔌 Is mobile:', /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+      console.log('🔌 Connection time:', new Date().toISOString())
+      console.log('🔌 Socket instance:', socketInstance)
       setIsConnected(true)
     })
 

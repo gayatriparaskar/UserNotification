@@ -130,6 +130,12 @@ const useRealtimeNotifications = () => {
       isProcessingNotification = false
     }
 
+    // Join user room for receiving notifications
+    if (socket && socket.connected && user && user._id) {
+      console.log('🔔 Joining user room for user:', user._id)
+      socket.emit('join-user-room', user._id)
+    }
+
     // Listen for notifications (backend emits 'new-notification')
     console.log('🔔 Setting up socket event listeners...')
     console.log('🔔 Socket connected for notifications:', socket.connected)
@@ -141,6 +147,9 @@ const useRealtimeNotifications = () => {
       console.log('🔔 Notification data keys:', Object.keys(data || {}))
       console.log('🔔 Socket connected when receiving:', socket.connected)
       console.log('🔔 Socket ID when receiving:', socket.id)
+      console.log('🔔 User agent when receiving:', navigator.userAgent)
+      console.log('🔔 Is mobile when receiving:', /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+      console.log('🔔 Timestamp when receiving:', new Date().toISOString())
       handleNotification(data)
     })
     
