@@ -228,6 +228,8 @@ export const NotificationProvider = ({ children }) => {
     console.log('🔔 Adding new notification:', notification.title)
     console.log('🔔 Notification data:', notification)
     console.log('🔔 Current unread count:', state.unreadCount)
+    console.log('🔔 Notification ID:', notification._id || notification.id)
+    console.log('🔔 Notification type:', notification.type)
     
     // Check if notification already exists to prevent duplicates
     const notificationId = notification._id || notification.id
@@ -245,7 +247,12 @@ export const NotificationProvider = ({ children }) => {
     
     // Always play sound for new real-time notifications
     console.log('🔔 Calling playNotificationSound...')
-    playNotificationSound()
+    try {
+      playNotificationSound()
+      console.log('🔔 Sound function called successfully')
+    } catch (error) {
+      console.error('🔔 Error calling sound function:', error)
+    }
     
     // Update badge count
     const newUnreadCount = state.unreadCount + 1

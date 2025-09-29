@@ -139,6 +139,8 @@ const useRealtimeNotifications = () => {
       console.log('🔔 Received new-notification event:', data)
       console.log('🔔 Notification data type:', typeof data)
       console.log('🔔 Notification data keys:', Object.keys(data || {}))
+      console.log('🔔 Socket connected when receiving:', socket.connected)
+      console.log('🔔 Socket ID when receiving:', socket.id)
       handleNotification(data)
     })
     
