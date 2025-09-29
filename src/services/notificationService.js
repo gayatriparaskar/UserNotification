@@ -18,10 +18,22 @@ class NotificationService {
     }
 
     try {
+      console.log('Requesting notification permission...');
+      console.log('Current permission:', this.permission);
+      console.log('User agent:', navigator.userAgent);
+      
       const permission = await Notification.requestPermission();
       this.permission = permission;
-      console.log('Notification permission:', permission);
-      return permission === 'granted';
+      console.log('Notification permission result:', permission);
+      
+      // Check if permission was actually granted
+      if (permission === 'granted') {
+        console.log('Notification permission granted successfully');
+        return true;
+      } else {
+        console.log('Notification permission denied or dismissed');
+        return false;
+      }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       return false;

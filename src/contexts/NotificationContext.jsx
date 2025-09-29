@@ -8,6 +8,8 @@ const playNotificationSound = () => {
     console.log('🔔 Playing notification sound...')
     console.log('🔔 Window object available:', typeof window !== 'undefined')
     console.log('🔔 AudioContext available:', typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined')
+    console.log('🔔 User agent:', navigator.userAgent)
+    console.log('🔔 Is mobile:', /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
     
     // Check if audio context is suspended and resume if needed
     const audioContext = new (window.AudioContext || window.webkitAudioContext)()
@@ -30,6 +32,7 @@ const playNotificationSound = () => {
     }
   } catch (error) {
     console.log('🔔 Could not play notification sound:', error)
+    console.log('🔔 Error details:', error.message)
   }
 }
 

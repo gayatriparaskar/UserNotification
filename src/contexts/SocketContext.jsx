@@ -19,23 +19,29 @@ export const SocketProvider = ({ children }) => {
     console.log(`🔌 Connecting to socket (attempt #${connectionCount}):`, socketUrl)
     
     const socketInstance = io(socketUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Try polling first on mobile
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 2000,
-      reconnectionDelayMax: 10000,
-      timeout: 30000,
+      reconnectionAttempts: 15,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 15000,
+      timeout: 20000,
       forceNew: true,
       upgrade: true,
       rememberUpgrade: false,
-      withCredentials: true
+      withCredentials: true,
+      // Mobile-specific options
+      pingTimeout: 60000,
+      pingInterval: 25000
     })
 
     socketInstance.on('connect', () => {
       console.log('🔌 Socket connected successfully')
       console.log('🔌 Socket URL:', socketUrl)
       console.log('🔌 Socket ID:', socketInstance.id)
+      console.log('🔌 Transport:', socketInstance.io.engine.transport.name)
+      console.log('🔌 User agent:', navigator.userAgent)
+      console.log('🔌 Is mobile:', /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
       setIsConnected(true)
     })
 

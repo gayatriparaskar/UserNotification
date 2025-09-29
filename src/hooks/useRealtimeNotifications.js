@@ -39,6 +39,9 @@ const useRealtimeNotifications = () => {
     console.log('🔔 Socket ID:', socket.id)
     console.log('🔔 User role:', user.role)
     console.log('🔔 Is admin:', user.role === 'admin')
+    console.log('🔔 User agent:', navigator.userAgent)
+    console.log('🔔 Is mobile:', /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    console.log('🔔 Notification permission:', Notification.permission)
 
     // Wait for socket to be connected before joining room
     if (!socket.connected) {
