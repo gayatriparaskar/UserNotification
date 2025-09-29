@@ -13,30 +13,38 @@ class NotificationService {
       return false;
     }
 
-    if (this.permission === 'granted') {
+    // Check current permission status
+    if (Notification.permission === "granted") {
+      console.log("Notification enabled");
+      this.permission = 'granted';
       return true;
-    }
-
-    try {
-      console.log('Requesting notification permission...');
-      console.log('Current permission:', this.permission);
-      console.log('User agent:', navigator.userAgent);
-      
-      const permission = await Notification.requestPermission();
-      this.permission = permission;
-      console.log('Notification permission result:', permission);
-      
-      // Check if permission was actually granted
-      if (permission === 'granted') {
-        console.log('Notification permission granted successfully');
-        return true;
-      } else {
-        console.log('Notification permission denied or dismissed');
+    } else if (Notification.permission === "denied") {
+      console.log("Notification blocked");
+      this.permission = 'denied';
+      return false;
+    } else {
+      // Permission is 'default', request it
+      try {
+        console.log('Requesting notification permission...');
+        console.log('Current permission:', this.permission);
+        console.log('User agent:', navigator.userAgent);
+        
+        const permission = await Notification.requestPermission();
+        this.permission = permission;
+        console.log('Notification permission result:', permission);
+        
+        // Check if permission was actually granted
+        if (permission === 'granted') {
+          console.log('Notification permission granted successfully');
+          return true;
+        } else {
+          console.log('Notification permission denied or dismissed');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
         return false;
       }
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
-      return false;
     }
   }
 
@@ -103,8 +111,8 @@ class NotificationService {
         requireInteraction: true,
         ...options
       });
-
-      notification.onclick = () => {
+        
+        notification.onclick = () => {
         window.focus();
         notification.close();
       };
@@ -125,10 +133,10 @@ class NotificationService {
   setBadgeCount(count) {
     if (typeof window !== 'undefined' && 'setAppBadge' in navigator) {
       try {
-        if (count > 0) {
+      if (count > 0) {
           navigator.setAppBadge(count)
           console.log('App badge set to:', count)
-        } else {
+      } else {
           navigator.clearAppBadge()
           console.log('App badge cleared')
         }
