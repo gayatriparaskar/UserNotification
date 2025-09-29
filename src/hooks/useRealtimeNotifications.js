@@ -34,6 +34,9 @@ const useRealtimeNotifications = () => {
     }
 
     console.log('🔔 Setting up real-time notifications for user:', userId)
+    console.log('🔔 Socket object:', socket)
+    console.log('🔔 Socket connected:', socket.connected)
+    console.log('🔔 Socket ID:', socket.id)
 
     // Wait for socket to be connected before joining room
     if (!socket.connected) {
@@ -53,6 +56,8 @@ const useRealtimeNotifications = () => {
       console.log('🔔 Received real-time notification:', data)
       console.log('🔔 Data type:', typeof data)
       console.log('🔔 Data keys:', Object.keys(data || {}))
+      console.log('🔔 Socket connected:', socket.connected)
+      console.log('🔔 Socket ID:', socket.id)
       
       // Check global processing flag
       if (isProcessingNotification) {
@@ -94,7 +99,7 @@ const useRealtimeNotifications = () => {
       addNotification(notification)
       
       // Show browser notification
-      if (notificationService.getPermissionStatus().canShow) {
+      if (notificationService.getPermissionStatus && notificationService.getPermissionStatus().canShow) {
         console.log('🔔 Showing browser notification')
         notificationService.showNotification(notification.title, {
           body: notification.message,
@@ -148,12 +153,12 @@ const useRealtimeNotifications = () => {
       if (isAuthenticated) {
         try {
           // Request basic notification permission
-          const granted = await notificationService.requestPermission()
+          const granted = await (notificationService.requestPermission ? notificationService.requestPermission() : Promise.resolve(false))
           if (granted) {
             console.log('🔔 Notification permission granted')
             
             // Subscribe to web push notifications
-            const pushSubscribed = await notificationService.subscribeToPush()
+            const pushSubscribed = await (notificationService.subscribeToPush ? notificationService.subscribeToPush() : Promise.resolve(false))
             if (pushSubscribed) {
               console.log('🔔 Web push subscription successful')
             } else {
@@ -185,7 +190,7 @@ const useRealtimeNotifications = () => {
 
   return {
     isConnected,
-    permissionStatus: notificationService.getPermissionStatus()
+    permissionStatus: notificationService.getPermissionStatus ? notificationService.getPermissionStatus() : { status: 'denied', canShow: false }
   }
 }
 

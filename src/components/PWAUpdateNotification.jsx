@@ -1,106 +1,65 @@
-import React, { useState, useEffect } from 'react'
-import { RefreshCw, X, Download } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { RefreshCw, X, Download } from 'lucide-react';
 
 const PWAUpdateNotification = () => {
-  const [showUpdate, setShowUpdate] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
-    // Listen for PWA update events
-    const handleUpdateAvailable = () => {
-      setShowUpdate(true)
+    // Listen for service worker updates
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        setUpdateAvailable(true);
+        setShowUpdate(true);
+      });
     }
+  }, []);
 
-    const handleUpdateComplete = () => {
-      setShowUpdate(false)
-      setIsUpdating(false)
+  const handleUpdate = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then((registration) => {
+        if (registration && registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          window.location.reload();
+        }
+      });
     }
-
-    window.addEventListener('pwa-update-available', handleUpdateAvailable)
-    window.addEventListener('pwa-controller-change', handleUpdateComplete)
-
-    return () => {
-      window.removeEventListener('pwa-update-available', handleUpdateAvailable)
-      window.removeEventListener('pwa-controller-change', handleUpdateComplete)
-    }
-  }, [])
-
-  const handleUpdate = async () => {
-    setIsUpdating(true)
-    try {
-      // Import PWA service dynamically to avoid circular dependencies
-      const { default: pwaService } = await import('../services/pwaService')
-      await pwaService.updateServiceWorker()
-    } catch (error) {
-      console.error('Update failed:', error)
-      setIsUpdating(false)
-    }
-  }
+  };
 
   const handleDismiss = () => {
-    setShowUpdate(false)
-    // Store dismissal to avoid showing again immediately
-    localStorage.setItem('pwa-update-dismissed', Date.now().toString())
-  }
+    setShowUpdate(false);
+  };
 
-  if (!showUpdate) {
-    return null
-  }
+  if (!showUpdate || !updateAvailable) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 max-w-sm">
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 animate-slide-in">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <Download className="h-5 w-5 text-primary-600" />
+    <div className="fixed bottom-4 left-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50 md:left-auto md:right-4 md:max-w-sm">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <RefreshCw className="h-5 w-5" />
+          <div>
+            <p className="font-medium">Update Available</p>
+            <p className="text-sm text-blue-100">New version of SnacksShop is ready</p>
           </div>
-          
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-800 text-sm">
-              Update Available
-            </h3>
-            <p className="text-xs text-gray-600 mt-1">
-              A new version of SnakeShop is ready to install
-            </p>
-            
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={handleUpdate}
-                disabled={isUpdating}
-                className="btn btn-primary btn-sm flex items-center gap-1"
-              >
-                {isUpdating ? (
-                  <>
-                    <RefreshCw className="h-3 w-3 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Download className="h-3 w-3" />
-                    Update Now
-                  </>
-                )}
-              </button>
-              
-              <button
-                onClick={handleDismiss}
-                className="btn btn-outline btn-sm"
-              >
-                Later
-              </button>
-            </div>
-          </div>
-          
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleUpdate}
+            className="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-blue-50 transition-colors flex items-center space-x-1"
+          >
+            <Download className="h-3 w-3" />
+            <span>Update</span>
+          </button>
           <button
             onClick={handleDismiss}
-            className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            className="text-blue-200 hover:text-white transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PWAUpdateNotification
+export default PWAUpdateNotification;

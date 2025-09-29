@@ -4,6 +4,8 @@ import { Calendar, Users, DollarSign, TrendingUp, Eye, Plus, Check, X, Settings,
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
 import { useSocket } from '../contexts/SocketContext'
+import NotificationTest from '../components/NotificationTest'
+import NotificationTestButton from '../components/NotificationTestButton'
 import apiService from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -175,7 +177,8 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Overview', icon: <TrendingUp className="h-5 w-5" /> },
     { id: 'orders', label: 'Orders', icon: <ShoppingCart className="h-5 w-5" /> },
     { id: 'users', label: 'Users', icon: <Users className="h-5 w-5" /> },
-    { id: 'products', label: 'Products', icon: <Package className="h-5 w-5" /> }
+    { id: 'products', label: 'Products', icon: <Package className="h-5 w-5" /> },
+    { id: 'notifications', label: 'Notifications', icon: <Bell className="h-5 w-5" /> }
   ]
 
   if (!isAuthenticated || !isAdmin) {
@@ -536,6 +539,14 @@ const AdminDashboard = () => {
                 <p className="text-gray-500 text-center py-8">No products found</p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 'notifications' && (
+          <div className="space-y-6">
+            <NotificationTestButton />
+            <NotificationTest />
           </div>
         )}
 

@@ -6,20 +6,26 @@ import apiService from '../services/api'
 const playNotificationSound = () => {
   try {
     console.log('🔔 Playing notification sound...')
+    console.log('🔔 Window object available:', typeof window !== 'undefined')
+    console.log('🔔 AudioContext available:', typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined')
     
     // Check if audio context is suspended and resume if needed
     const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    console.log('🔔 Audio context created, state:', audioContext.state)
     
     if (audioContext.state === 'suspended') {
+      console.log('🔔 Audio context suspended, trying to resume...')
       // Try to resume the audio context (requires user interaction)
       audioContext.resume().then(() => {
+        console.log('🔔 Audio context resumed successfully')
         playSound(audioContext)
-      }).catch(() => {
-        console.log('🔔 Audio context could not be resumed - user interaction required')
+      }).catch((error) => {
+        console.log('🔔 Audio context could not be resumed - user interaction required:', error)
         // Try to play sound anyway
         playSound(audioContext)
       })
     } else {
+      console.log('🔔 Audio context ready, playing sound...')
       playSound(audioContext)
     }
   } catch (error) {
@@ -217,6 +223,8 @@ export const NotificationProvider = ({ children }) => {
   // Add new notification (for real-time updates)
   const addNotification = (notification) => {
     console.log('🔔 Adding new notification:', notification.title)
+    console.log('🔔 Notification data:', notification)
+    console.log('🔔 Current unread count:', state.unreadCount)
     
     // Check if notification already exists to prevent duplicates
     const notificationId = notification._id || notification.id
@@ -229,9 +237,11 @@ export const NotificationProvider = ({ children }) => {
       return
     }
     
+    console.log('🔔 Dispatching ADD_NOTIFICATION action')
     dispatch({ type: 'ADD_NOTIFICATION', payload: notification })
     
     // Always play sound for new real-time notifications
+    console.log('🔔 Calling playNotificationSound...')
     playNotificationSound()
     
     // Update badge count

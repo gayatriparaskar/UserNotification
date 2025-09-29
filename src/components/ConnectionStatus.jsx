@@ -1,36 +1,50 @@
-import React from 'react'
-import { useNotifications } from '../contexts/NotificationContext'
-import { Wifi, WifiOff } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { Wifi, WifiOff } from 'lucide-react';
 
 const ConnectionStatus = () => {
-  const { error, isOnline } = useNotifications()
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [showStatus, setShowStatus] = useState(false);
 
-  // Don't show if there's no error or if we're online
-  if (!error || isOnline) {
-    return null
-  }
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setShowStatus(true);
+      setTimeout(() => setShowStatus(false), 3000);
+    };
 
-  // Don't show timeout errors as they're temporary
-  if (error && error.includes('timeout')) {
-    return null
-  }
+    const handleOffline = () => {
+      setIsOnline(false);
+      setShowStatus(true);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (!showStatus) return null;
 
   return (
-    <div className="fixed top-4 left-4 right-4 z-50 max-w-md mx-auto">
-      <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
-        <WifiOff className="h-4 w-4 text-red-500" />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-red-800">Connection Issue</p>
-          <p className="text-xs text-red-600">
-            {error.includes('timeout') ? 'Server is not responding' : 
-             error.includes('overloaded') ? 'Server is overloaded' :
-             'Unable to connect to server'}
-          </p>
-        </div>
-        <Wifi className="h-4 w-4 text-red-500" />
-      </div>
+    <div className={`fixed top-4 right-4 z-50 transition-all duration-300 ${
+      isOnline ? 'bg-green-500' : 'bg-red-500'
+    } text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2`}>
+      {isOnline ? (
+        <>
+          <Wifi className="h-4 w-4" />
+          <span className="text-sm font-medium">Back Online</span>
+        </>
+      ) : (
+        <>
+          <WifiOff className="h-4 w-4" />
+          <span className="text-sm font-medium">You're Offline</span>
+        </>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default ConnectionStatus
+export default ConnectionStatus;

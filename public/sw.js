@@ -1,7 +1,8 @@
-// SnakeShop Service Worker
-const CACHE_NAME = 'snakeshop-v1.0.0';
-const STATIC_CACHE_NAME = 'snakeshop-static-v1.0.0';
-const DYNAMIC_CACHE_NAME = 'snakeshop-dynamic-v1.0.0';
+// SnacksShop Service Worker - Enhanced PWA Support
+const CACHE_NAME = 'snacksshop-v2.0.0';
+const STATIC_CACHE_NAME = 'snacksshop-static-v2.0.0';
+const DYNAMIC_CACHE_NAME = 'snacksshop-dynamic-v2.0.0';
+const NOTIFICATION_CACHE_NAME = 'snacksshop-notifications-v2.0.0';
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
@@ -311,54 +312,105 @@ async function syncOrders(orders) {
   console.log('Service Worker: Syncing orders', orders);
 }
 
-// Push notifications
+// Enhanced Push notifications for all devices
 self.addEventListener('push', (event) => {
   console.log('Service Worker: Push notification received');
   
-  const options = {
-    body: event.data ? event.data.text() : 'New notification from SnakeShop',
+  let notificationData = {
+    title: 'SnacksShop',
+    body: 'New notification from SnacksShop',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
-    vibrate: [100, 50, 100],
+    image: '/icons/icon-512x512.png',
     data: {
       dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
+      primaryKey: 1,
+      url: '/'
+    }
+  };
+
+  // Parse notification data if available
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = { ...notificationData, ...data };
+    } catch (e) {
+      notificationData.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    image: notificationData.image,
+    vibrate: [200, 100, 200, 100, 200],
+    silent: false,
+    requireInteraction: true,
+    renotify: true,
+    tag: 'snacksshop-notification',
+    timestamp: Date.now(),
+    data: notificationData.data,
     actions: [
       {
-        action: 'explore',
-        title: 'View Details',
+        action: 'view',
+        title: 'Open App',
         icon: '/icons/icon-96x96.png'
       },
       {
-        action: 'close',
-        title: 'Close',
+        action: 'dismiss',
+        title: 'Dismiss',
         icon: '/icons/icon-96x96.png'
       }
     ]
   };
   
   event.waitUntil(
-    self.registration.showNotification('SnakeShop', options)
+    self.registration.showNotification(notificationData.title, options)
   );
 });
 
-// Notification click
+// Enhanced notification click handling
 self.addEventListener('notificationclick', (event) => {
-  console.log('Service Worker: Notification clicked');
+  console.log('Service Worker: Notification clicked', event.action);
   
   event.notification.close();
   
-  if (event.action === 'explore') {
+  if (event.action === 'view') {
+    // Open the app and navigate to specific page
     event.waitUntil(
-      clients.openWindow('/catalog')
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+          // Check if app is already open
+          for (const client of clientList) {
+            if (client.url.includes(self.location.origin) && 'focus' in client) {
+              client.focus();
+              client.postMessage({ type: 'NAVIGATE', url: event.notification.data?.url || '/' });
+              return;
+            }
+          }
+          // Open new window if app is not open
+          return clients.openWindow(event.notification.data?.url || '/');
+        })
     );
-  } else if (event.action === 'close') {
+  } else if (event.action === 'dismiss') {
     // Just close the notification
+    return;
   } else {
     // Default action - open the app
     event.waitUntil(
-      clients.openWindow('/')
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+          // Check if app is already open
+          for (const client of clientList) {
+            if (client.url.includes(self.location.origin) && 'focus' in client) {
+              client.focus();
+              return;
+            }
+          }
+          // Open new window if app is not open
+          return clients.openWindow('/');
+        })
     );
   }
 });

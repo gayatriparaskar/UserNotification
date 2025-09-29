@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Search, ShoppingCart, Heart, User, Menu, X, Bell } from 'lucide-react'
+import { Search, ShoppingCart, Heart, User, Menu, X, Bell, Download } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
+import { usePWA } from '../hooks/usePWA'
 import NotificationCenter from './NotificationCenter'
 
 const Navbar = () => {
@@ -13,6 +14,7 @@ const Navbar = () => {
   const { getTotalItems } = useCart()
   const { user, isAuthenticated, logout, isAdmin } = useAuth()
   const { unreadCount } = useNotifications()
+  const { isInstallable, isInstalled, install } = usePWA()
   const location = useLocation()
 
   const navLinks = [
@@ -98,6 +100,17 @@ const Navbar = () => {
                 <span className="badge">{getTotalItems()}</span>
               )}
             </Link>
+
+            {/* PWA Install Button */}
+            {isInstallable && !isInstalled && (
+              <button
+                onClick={install}
+                className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
+                title="Install App"
+              >
+                <Download className="h-6 w-6" />
+              </button>
+            )}
 
             {/* User Menu */}
             <div className="relative">
