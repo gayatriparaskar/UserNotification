@@ -64,10 +64,10 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center">
-              <span className="text-primary-800 font-bold text-lg">🍟</span>
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-secondary-500 rounded-full flex items-center justify-center">
+              <span className="text-primary-800 font-bold text-sm sm:text-lg">🍟</span>
             </div>
-            <span className="text-xl font-bold">SnacksShop</span>
+            <span className="text-lg sm:text-xl font-bold">SnacksShop</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -96,17 +96,17 @@ const Navbar = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Notifications */}
             {isAuthenticated && (
               <>
                 <button 
                   onClick={() => setIsNotificationOpen(true)}
-                  className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors group"
+                  className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors group touch-manipulation"
                 >
-                  <Bell className="h-6 w-6" />
+                  <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center font-bold animate-pulse shadow-lg px-1">
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-4 h-4 sm:min-w-5 sm:h-5 flex items-center justify-center font-bold animate-pulse shadow-lg px-1">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -115,24 +115,24 @@ const Navbar = () => {
                 {Notification.permission === 'denied' && (
                   <button 
                     onClick={handleRequestNotificationPermission}
-                    className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
+                    className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation"
                     title="Enable notifications"
                   >
-                    <Settings className="h-6 w-6" />
+                    <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
                   </button>
                 )}
               </>
             )}
 
             {/* Wishlist */}
-            <button className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors">
-              <Heart className="h-6 w-6" />
+            <button className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation">
+              <Heart className="h-5 w-5 sm:h-6 sm:w-6" />
               <span className="badge">0</span>
             </button>
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors">
-              <ShoppingCart className="h-6 w-6" />
+            <Link to="/cart" className="relative p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation">
+              <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
               {getTotalItems() > 0 && (
                 <span className="badge">{getTotalItems()}</span>
               )}
@@ -142,10 +142,10 @@ const Navbar = () => {
             {isInstallable && !isInstalled && (
               <button
                 onClick={handlePWAInstall}
-                className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
+                className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation"
                 title="Install App"
               >
-                <Download className="h-6 w-6" />
+                <Download className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             )}
 
@@ -153,13 +153,13 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
+                className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation"
               >
-                <User className="h-6 w-6" />
+                <User className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 max-h-80 overflow-y-auto">
                   {isAuthenticated ? (
                     <>
                       <div className="px-4 py-2 text-sm text-gray-700 border-b">
@@ -167,7 +167,7 @@ const Navbar = () => {
                       </div>
                       <Link
                         to="/orders"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         My Orders
@@ -177,7 +177,7 @@ const Navbar = () => {
                           logout()
                           setIsUserMenuOpen(false)
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation"
                       >
                         Logout
                       </button>
@@ -186,14 +186,14 @@ const Navbar = () => {
                     <>
                       <Link
                         to="/login"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         Login
                       </Link>
                       <Link
                         to="/register"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 touch-manipulation"
                         onClick={() => setIsUserMenuOpen(false)}
                       >
                         Register
@@ -204,25 +204,25 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
-            >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors touch-manipulation"
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
+          </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-white border-opacity-20">
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`block px-4 py-2 rounded-lg transition-colors ${
+                  className={`block px-4 py-3 rounded-lg transition-colors touch-manipulation ${
                     isActive(link.path) 
                       ? 'bg-secondary-500 text-primary-800' 
                       : 'hover:bg-white hover:bg-opacity-10'
