@@ -121,6 +121,37 @@ class NotificationService {
     return this.isSupported && typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
   }
 
+  // Set app badge count
+  setBadgeCount(count) {
+    if (typeof window !== 'undefined' && 'setAppBadge' in navigator) {
+      try {
+        if (count > 0) {
+          navigator.setAppBadge(count)
+          console.log('App badge set to:', count)
+        } else {
+          navigator.clearAppBadge()
+          console.log('App badge cleared')
+        }
+      } catch (error) {
+        console.error('Error setting app badge:', error)
+      }
+    } else {
+      console.log('App badge API not supported')
+    }
+  }
+
+  // Clear app badge
+  clearBadge() {
+    if (typeof window !== 'undefined' && 'clearAppBadge' in navigator) {
+      try {
+        navigator.clearAppBadge()
+        console.log('App badge cleared')
+      } catch (error) {
+        console.error('Error clearing app badge:', error)
+      }
+    }
+  }
+
   // Get current subscription
   async getSubscription() {
     if (typeof window === 'undefined' || !this.registration) {

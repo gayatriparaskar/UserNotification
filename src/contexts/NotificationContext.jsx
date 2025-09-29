@@ -77,9 +77,24 @@ const notificationReducer = (state, action) => {
       }
     
     case 'SET_NOTIFICATIONS':
+      const unreadCount = action.payload.filter(n => !n.isRead).length
+      
+      // Update app badge with initial unread count
+      try {
+        if (unreadCount > 0) {
+          notificationService.setBadgeCount(unreadCount)
+        } else {
+          notificationService.clearBadge()
+        }
+        console.log('🔔 Initial app badge set to:', unreadCount)
+      } catch (error) {
+        console.error('🔔 Error setting initial app badge:', error)
+      }
+      
       return {
         ...state,
         notifications: action.payload,
+        unreadCount,
         loading: false,
         error: null
       }
@@ -102,6 +117,20 @@ const notificationReducer = (state, action) => {
       }
     
     case 'MARK_AS_READ':
+      const updatedUnreadCount = Math.max(0, state.unreadCount - 1)
+      
+      // Update app badge when notification is marked as read
+      try {
+        if (updatedUnreadCount > 0) {
+          notificationService.setBadgeCount(updatedUnreadCount)
+        } else {
+          notificationService.clearBadge()
+        }
+        console.log('🔔 App badge updated to:', updatedUnreadCount)
+      } catch (error) {
+        console.error('🔔 Error updating app badge:', error)
+      }
+      
       return {
         ...state,
         notifications: state.notifications.map(notification =>
@@ -109,10 +138,18 @@ const notificationReducer = (state, action) => {
             ? { ...notification, isRead: true, readAt: new Date() }
             : notification
         ),
-        unreadCount: Math.max(0, state.unreadCount - 1)
+        unreadCount: updatedUnreadCount
       }
     
     case 'MARK_ALL_AS_READ':
+      // Clear app badge when all notifications are marked as read
+      try {
+        notificationService.clearBadge()
+        console.log('🔔 App badge cleared - all notifications read')
+      } catch (error) {
+        console.error('🔔 Error clearing app badge:', error)
+      }
+      
       return {
         ...state,
         notifications: state.notifications.map(notification => ({
@@ -217,6 +254,14 @@ export const NotificationProvider = ({ children }) => {
       const response = await apiService.markAllNotificationsAsRead()
       if (response.success) {
         dispatch({ type: 'MARK_ALL_AS_READ' })
+        
+        // Clear app badge when all notifications are read
+        try {
+          notificationService.clearBadge()
+          console.log('🔔 App badge cleared - all notifications read')
+        } catch (error) {
+          console.error('🔔 Error clearing app badge:', error)
+        }
       }
     } catch (error) {
       console.error('Error marking all notifications as read:', error)
@@ -257,6 +302,14 @@ export const NotificationProvider = ({ children }) => {
     // Update badge count
     const newUnreadCount = state.unreadCount + 1
     console.log('🔔 New unread count:', newUnreadCount)
+    
+    // Update app badge
+    try {
+      notificationService.setBadgeCount(newUnreadCount)
+      console.log('🔔 App badge updated to:', newUnreadCount)
+    } catch (error) {
+      console.error('🔔 Error updating app badge:', error)
+    }
   }
 
   // Load notifications on mount with retry logic

@@ -23,6 +23,14 @@ const PWAInstallPrompt = () => {
     };
 
     detectDevice();
+    
+    // Debug PWA status
+    console.log('PWA Debug Info:');
+    console.log('- Service Worker:', 'serviceWorker' in navigator);
+    console.log('- HTTPS:', location.protocol === 'https:');
+    console.log('- Manifest:', document.querySelector('link[rel="manifest"]')?.href);
+    console.log('- Display mode:', window.matchMedia('(display-mode: standalone)').matches);
+    console.log('- Standalone:', window.navigator.standalone);
 
     // Check if app is already installed
     const checkInstallStatus = () => {
@@ -85,8 +93,11 @@ const PWAInstallPrompt = () => {
     localStorage.setItem('pwa-install-dismissed', Date.now().toString());
   };
 
-  // Don't show if already installed or recently dismissed
-  if (isInstalled || !showInstallPrompt) return null;
+  // Show manual install instructions for mobile if no automatic prompt
+  const showManualInstall = deviceType === 'mobile' && !deferredPrompt && !isInstalled;
+  
+  // Don't show if already installed or recently dismissed (unless manual install)
+  if (isInstalled || (!showInstallPrompt && !showManualInstall)) return null;
 
   const getDeviceIcon = () => {
     switch (deviceType) {

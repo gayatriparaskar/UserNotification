@@ -47,6 +47,17 @@ const Navbar = () => {
     }
   }
 
+  const handlePWAInstall = async () => {
+    try {
+      const success = await install()
+      if (success) {
+        console.log('PWA installed successfully')
+      }
+    } catch (error) {
+      console.error('PWA install error:', error)
+    }
+  }
+
   return (
     <nav className="bg-gradient-primary text-white shadow-lg sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -130,7 +141,7 @@ const Navbar = () => {
             {/* PWA Install Button */}
             {isInstallable && !isInstalled && (
               <button
-                onClick={install}
+                onClick={handlePWAInstall}
                 className="p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-colors"
                 title="Install App"
               >
