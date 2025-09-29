@@ -37,6 +37,8 @@ const useRealtimeNotifications = () => {
     console.log('🔔 Socket object:', socket)
     console.log('🔔 Socket connected:', socket.connected)
     console.log('🔔 Socket ID:', socket.id)
+    console.log('🔔 User role:', user.role)
+    console.log('🔔 Is admin:', user.role === 'admin')
 
     // Wait for socket to be connected before joining room
     if (!socket.connected) {
@@ -127,9 +129,13 @@ const useRealtimeNotifications = () => {
 
     // Listen for notifications (backend emits 'new-notification')
     console.log('🔔 Setting up socket event listeners...')
+    console.log('🔔 Socket connected for notifications:', socket.connected)
+    console.log('🔔 Socket ID for notifications:', socket.id)
     
     socket.on('new-notification', (data) => {
       console.log('🔔 Received new-notification event:', data)
+      console.log('🔔 Notification data type:', typeof data)
+      console.log('🔔 Notification data keys:', Object.keys(data || {}))
       handleNotification(data)
     })
     

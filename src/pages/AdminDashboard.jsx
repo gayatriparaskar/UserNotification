@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNotifications } from '../contexts/NotificationContext'
 import { useSocket } from '../contexts/SocketContext'
 import NotificationTest from '../components/NotificationTest'
-import NotificationTestButton from '../components/NotificationTestButton'
 import apiService from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -545,7 +544,6 @@ const AdminDashboard = () => {
         {/* Notifications Tab */}
         {activeTab === 'notifications' && (
           <div className="space-y-6">
-            <NotificationTestButton />
             <NotificationTest />
           </div>
         )}

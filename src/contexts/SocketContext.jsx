@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Initialize socket connection
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://notificationbackend-35f6.onrender.com/api'
     const socketUrl = apiUrl.replace('/api', '')
     
     connectionCount++
@@ -34,6 +34,8 @@ export const SocketProvider = ({ children }) => {
 
     socketInstance.on('connect', () => {
       console.log('🔌 Socket connected successfully')
+      console.log('🔌 Socket URL:', socketUrl)
+      console.log('🔌 Socket ID:', socketInstance.id)
       setIsConnected(true)
     })
 
@@ -44,6 +46,8 @@ export const SocketProvider = ({ children }) => {
 
     socketInstance.on('connect_error', (error) => {
       console.error('🔌 Socket connection error:', error)
+      console.error('🔌 Socket URL attempted:', socketUrl)
+      console.error('🔌 Error details:', error.message)
       setIsConnected(false)
     })
 
