@@ -14,6 +14,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import PWAUpdateNotification from './components/PWAUpdateNotification'
 import ConnectionStatus from './components/ConnectionStatus'
+import MobilePWAInstall from './components/MobilePWAInstall'
+import MobileNotificationTest from './components/MobileNotificationTest'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
@@ -75,6 +77,7 @@ const AppContent = () => {
               <AddProduct />
             </ProtectedRoute>
           } />
+          <Route path="/mobile-test" element={<MobileNotificationTest />} />
         </Routes>
       </main>
       
@@ -86,6 +89,9 @@ const AppContent = () => {
       
       {/* PWA Update Notification */}
       <PWAUpdateNotification />
+      
+      {/* Mobile PWA Install */}
+      <MobilePWAInstall />
       
       <Toaster 
         position="top-right"
